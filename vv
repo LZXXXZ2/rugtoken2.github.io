@@ -1,0 +1,459 @@
+git clone https://github.com/LZXXXZ2/lzxxxz2.github.io.git
+cd lzxxxz2.github.io
+# 复制你的 index.html, style.css, script.js 到此处
+touch .nojekyll
+git add .<div class="museum">
+    <div class="decor-top"></div>
+    <div class="header">let tokens = [];
+let points = 100;
+let currentLang = 'zh';
+let musicPlaying = false;
+let currentUser = "Visitor" + Math.floor(Math.random() * 1000);
+
+// 语言内容
+const translations = {
+    zh: {
+        title: '垃圾代幣博物館',
+        subtitle: '在此殿堂，定制並交易汝之“至廢珍寶”',
+        createTitle: '鑄造廢幣',
+        createBtn: '入館珍藏',
+        marketTitle: '廢幣集市',
+        hallTitle: '代幣大廳',
+        myTokensTab: '我的藏品',
+        allTokensTab: '公共展廳',
+        tokenNamePlaceholder: '代幣名稱（例：廢紙幣）',
+        tokenDescPlaceholder: '描述（例：一文不值）',
+        pointsLabel: '汝之積分：',
+        priceLabel: '價格：',
+        ownerLabel: '持有者：',
+        buyBtn: '購之',
+        sellBtn: '售之',
+        alertMissing: '請填寫名稱和描述！',
+        alertOwnedOrPoor: '汝已擁有，或積分不足！',
+        alertNotYours: '非汝之物也！',
+        musicBtnOn: '音樂關',
+        musicBtnOff: '音樂開',
+        tips: [
+            '汝可創建虛擬市場中最令汝痛恨之同名幣，此幣或將帶來巨大損失！',
+            '謹慎，此廢幣或將成為集市中最無用之物！',
+            '此幣或許能騙過新手，但老手一笑置之。',
+            '恭喜，汝之垃圾傑作已入館，願它帶來歡笑而非財富！',
+            '此幣若真有價值，恐是天方夜譚也！'
+        ]
+    },
+    en: {
+        title: 'Worst Token Museum',
+        subtitle: 'Craft and trade your "most worthless treasures" here',
+        createTitle: 'Create a Trash Token',
+        createBtn: 'Add to Collection',
+        marketTitle: 'Token Market',
+        hallTitle: 'Token Hall',
+        myTokensTab: 'My Collection',
+        allTokensTab: 'Public Gallery',
+        tokenNamePlaceholder: 'Token Name (e.g., Junk Coin)',
+        tokenDescPlaceholder: 'Description (e.g., Worthless)',
+        pointsLabel: 'Your Points: ',
+        priceLabel: 'Price: ',
+        ownerLabel: 'Owner: ',
+        buyBtn: 'Buy',
+        sellBtn: 'Sell',
+        alertMissing: 'Please fill in name and description!',
+        alertOwnedOrPoor: 'You already own it or lack points!',
+        alertNotYours: 'This is not yours!',
+        musicBtnOn: 'Music Off',
+        musicBtnOff: 'Music On',
+        tips: [
+            'You can create a namesake of the token you hate most in the virtual market—it might bring you huge losses!',
+            'Beware, this trash token might become the most useless item in the market!',
+            'This coin might fool newbies, but veterans will just laugh it off.',
+            'Congrats, your trash masterpiece is now in the museum—may it bring laughter, not riches!',
+            'If this coin ever gains value, it’d be a miracle!'
+        ]
+    }
+};
+
+// 创建代币
+function createToken() {
+    const name = document.getElementById("tokenName").value;
+    const desc = document.getElementById("tokenDesc").value;
+    
+    if (name && desc) {
+        const token = {
+            id: tokens.length + 1,
+            name: name,
+            desc: desc,
+            price: Math.floor(Math.random() * 50) + 1,
+            owner: currentLang === 'zh' ? '博物館' : 'Museum',
+            creator: currentUser
+        };
+        tokens.push(token);
+        document.getElementById("tokenName").value = "";
+        document.getElementById("tokenDesc").value = "";
+        
+        const tips = translations[currentLang].tips;
+        const randomTip = tips[Math.floor(Math.random() * tips.length)];
+        alert(randomTip);
+        
+        updateMarket();
+        updateHall();
+    } else {
+        alert(translations[currentLang].alertMissing);
+    }
+}
+
+// 更新市场
+function updateMarket() {
+    const market = document.getElementById("market");
+    market.innerHTML = `<p>${translations[currentLang].pointsLabel}${points}</p>`;
+    
+    tokens.forEach(token => {
+        market.innerHTML += `
+            <div class="token">
+                <strong>${token.name}</strong><br>
+                ${token.desc}<br>
+                ${translations[currentLang].priceLabel}${token.price} Points<br>
+                ${translations[currentLang].ownerLabel}${token.owner}<br>
+                <button onclick="buyToken(${token.id})">${translations[currentLang].buyBtn}</button>
+                <button onclick="sellToken(${token.id})">${translations[currentLang].sellBtn}</button>
+            </div>
+        `;
+    });
+}
+
+// 更新大厅
+function updateHall() {
+    const myTokens = document.getElementById("my-tokens");
+    const allTokens = document.getElementById("all-tokens");
+    const ownerYou = currentLang === 'zh' ? '你' : 'You';
+    
+    myTokens.innerHTML = `<p>${translations[currentLang].pointsLabel}${points}</p>`;
+    allTokens.innerHTML = '';
+    
+    tokens.filter(token => token.owner === ownerYou || token.creator === currentUser).forEach(token => {
+        myTokens.innerHTML += `
+            <div class="token">
+                <strong>${token.name}</strong><br>
+                ${token.desc}<br>
+                ${translations[currentLang].priceLabel}${token.price} Points<br>
+                ${translations[currentLang].ownerLabel}${token.owner}<br>
+                ${translations[currentLang].ownerLabel === '持有者：' ? '創作者：' : 'Creator: '}${token.creator}
+            </div>
+        `;
+    });
+    
+    tokens.forEach(token => {
+        allTokens.innerHTML += `
+            <div class="token">
+                <strong>${token.name}</strong><br>
+                ${token.desc}<br>
+                ${translations[currentLang].priceLabel}${token.price} Points<br>
+                ${translations[currentLang].ownerLabel}${token.owner}<br>
+                ${translations[currentLang].ownerLabel === '持有者：' ? '創作者：' : 'Creator: '}${token.creator}
+            </div>
+        `;
+    });
+}
+
+// 购买代币
+function buyToken(id) {
+    const token = tokens.find(t => t.id === id);
+    const ownerYou = currentLang === 'zh' ? '你' : 'You';
+    if (token.owner === ownerYou || points < token.price) {
+        alert(translations[currentLang].alertOwnedOrPoor);
+    } else {
+        points -= token.price;
+        token.owner = ownerYou;
+        updateMarket();
+        updateHall();
+    }
+}
+
+// 出售代币
+function sellToken(id) {
+    const token = tokens.find(t => t.id === id);
+    const ownerYou = currentLang === 'zh' ? '你' : 'You';
+    if (token.owner !== ownerYou) {
+        alert(translations[currentLang].alertNotYours);
+    } else {
+        points += token.price;
+        token.owner = currentLang === 'zh' ? '博物館' : 'Museum';
+        updateMarket();
+        updateHall();
+    }
+}
+
+// 切换页面
+function showSection(section) {
+    document.getElementById("create-section").style.display = section === 'create' ? 'block' : 'none';
+    document.getElementById("market-section").style.display = section === 'market' ? 'block' : 'none';
+    document.getElementById("hall-section").style.display = section === 'hall' ? 'block' : 'none';
+    if (section === 'market') updateMarket();
+    if (section === 'hall') updateHall();
+}
+
+// 切换大厅标签
+function showHallTab(tab) {
+    document.getElementById("my-tokens").style.display = tab === 'my-tokens' ? 'block' : 'none';
+    document.getElementById("all-tokens").style.display = tab === 'all-tokens' ? 'block' : 'none';
+}
+
+// 切换语言
+function changeLanguage() {
+    currentLang = document.getElementById("language").value;
+    
+    // 更新静态文本
+    document.getElementById("title").textContent = translations[currentLang].title;
+    document.getElementById("subtitle").textContent = translations[currentLang].subtitle;
+    document.getElementById("create-title").textContent = translations[currentLang].createTitle;
+    document.getElementById("create-btn").textContent = translations[currentLang].createBtn;
+    document.getElementById("market-title").textContent = translations[currentLang].marketTitle;
+    document.getElementById("hall-title").textContent = translations[currentLang].hallTitle;
+    document.getElementById("my-tokens-tab").textContent = translations[currentLang].myTokensTab;
+    document.getElementById("all-tokens-tab").textContent = translations[currentLang].allTokensTab;
+    document.getElementById("tokenName").placeholder = translations[currentLang].tokenNamePlaceholder;
+    document.getElementById("tokenDesc").placeholder = translations[currentLang].tokenDescPlaceholder;
+    document.getElementById("nav-create").textContent = translations[currentLang].createTitle;
+    document.getElementById("nav-market").textContent = translations[currentLang].marketTitle;
+    document.getElementById("nav-hall").textContent = translations[currentLang].hallTitle;
+    
+    // 更新动态内容
+    updateMusicButton();
+    updateMarket();
+    updateHall();
+}
+
+// 控制背景音乐
+function toggleMusic() {
+    const audio = document.getElementById("bgMusic");
+    if (musicPlaying) {
+        audio.pause();
+        musicPlaying = false;
+    } else {
+        audio.play();
+        musicPlaying = true;
+    }
+    updateMusicButton();
+}
+
+function updateMusicButton() {
+    document.getElementById("music-btn").textContent = musicPlaying ? translations[currentLang].musicBtnOn : translations[currentLang].musicBtnOff;
+}
+
+// 初始化
+showSection('create');
+showHallTab('my-tokens');
+changeLanguage();
+        <img src="https://body {
+    font-family: 'Georgia', serif;
+    text-align: center;
+    background: url('https://www.toptal.com/designers/subtlepatterns/uploads/paper.png');
+    background-size: cover;
+    margin: 0;
+    padding: 20px;
+}
+
+.museum {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+    background: rgba(255, 245, 230, 0.9);
+    border: 10px solid #8b4513;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.decor-top, .decor-bottom {
+    width: 100%;
+    height: 20px;
+    background: url('https://www.toptal.com/designers/subtlepatterns/uploads/vintage.png');
+    background-size: contain;
+    position: absolute;
+    left: 0;
+}
+.decor-top { top: 0; border-bottom: 2px solid #6b4e31; }
+.decor-bottom { bottom: 0; border-top: 2px solid #6b4e31; }
+
+.header {
+    position: relative;
+    padding: 20px;
+    border-bottom: 4px double #8b4513;
+}
+
+.scroll-img {
+    width: 200px;
+    margin-bottom: 10px;
+    filter: sepia(0.3);
+}
+
+.header h1 {
+    font-size: 48px;
+    color: #4a2c0d;
+    text-shadow: 2px 2px 4px #d2b48c;
+    margin: 10px 0;
+}
+
+#language {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px;
+    font-family: 'Georgia', serif;
+    background: #fffaf0;
+    border: 1px solid #6b4e31;
+}
+
+.header p {
+    font-size: 18px;
+    color: #6b4e31;
+    font-style: italic;
+}
+
+.nav {
+    margin: 20px 0;
+}
+.nav button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    background: #6b4e31;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    border-radius: 5px;
+}
+.nav button:hover {
+    background: #5c4033;
+}
+
+.create-section, .market-section, .hall-section {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(245, 222, 179, 0.7);
+    border: 2px dashed #8b4513;
+    border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #4a2c0d;
+    font-size: 28px;
+    border-bottom: 2px solid #8b4513;
+    display: inline-block;
+    padding-bottom: 5px;
+    background: linear-gradient(to right, transparent, #d2b48c, transparent);
+}
+
+input, textarea {
+    width: 80%;
+    margin: 10px auto;
+    padding: 8px;
+    border: 1px solid #6b4e31;
+    background: #fffaf0;
+    font-family: 'Georgia', serif;
+    display: block;
+    border-radius: 5px;
+}
+
+button {
+    padding: 12px 24px;
+    background: #8b4513;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #5c4033;
+}
+
+#market, .hall-tab {
+    margin-top: 20px;
+}
+
+.token {
+    border: 2px solid #6b4e31;
+    padding: 15px;
+    margin: 10px;
+    background: #fffaf0;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
+    color: #4a2c0d;
+    position: relative;
+}
+
+.token::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 10px;
+    height: 10px;
+    background: #8b4513;
+    border-radius: 50%;
+}
+
+.hall-tabs button {
+    margin: 0 10px;
+    padding: 8px 16px;
+    background: #6b4e31;
+}
+.hall-tabs button:hover {
+    background: #5c4033;
+}
+
+#music-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: #6b4e31;
+}www.pngall.com/wp-content/uploads/2016/04/Scroll-PNG-Clipart.png" alt="Scroll" class="scroll-img">
+        <h1 id="title">垃圾代幣博物館</h1>
+        <select id="language" onchange="changeLanguage()">
+            <option value="zh">繁體中文</option>
+            <option value="en">English</option>
+        </select>
+        <p id="subtitle">在此殿堂，定制並交易汝之“至廢珍寶”</p>
+    </div>
+    
+    <div class="nav">
+        <button onclick="showSection('create')" id="nav-create">鑄造廢幣</button>
+        <button onclick="showSection('market')" id="nav-market">廢幣集市</button>
+        <button onclick="showSection('hall')" id="nav-hall">代幣大廳</button>
+    </div>
+
+    <div class="create-section" id="create-section">
+        <h2 id="create-title">鑄造廢幣</h2>
+        <input id="tokenName" placeholder="代幣名稱（例：廢紙幣）">
+        <textarea id="tokenDesc" placeholder="描述（例：一文不值）"></textarea>
+        <button onclick="createToken()" id="create-btn">入館珍藏</button>
+    </div>
+
+    <div class="market-section" id="market-section" style="display: none;">
+        <h2 id="market-title">廢幣集市</h2>
+        <div id="market"></div>
+    </div>
+
+    <div class="hall-section" id="hall-section" style="display: none;">
+        <h2 id="hall-title">代幣大廳</h2>
+        <div class="hall-tabs">
+            <button onclick="showHallTab('my-tokens')" id="my-tokens-tab">我的藏品</button>
+            <button onclick="showHallTab('all-tokens')" id="all-tokens-tab">公共展廳</button>
+        </div>
+        <div id="my-tokens" class="hall-tab"></div>
+        <div id="all-tokens" class="hall-tab" style="display: none;"></div>
+    </div>
+
+    <div class="decor-bottom"></div>
+    
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    <button onclick="toggleMusic()" id="music-btn">音樂開/關</button>
+</div>
+git commit -m "Initial commit"
+git push origin main
